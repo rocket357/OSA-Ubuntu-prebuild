@@ -3,23 +3,23 @@ Scripts to configure br-mgmt, br-storage, br-vlan, br-vxlan, etc... along with c
 
 These scripts are WIP and targeted to a specific network configuration:
 
-### ASSUMPTIONS
-# I make a lot of assumptions in these scripts.  I wrote them to run pre-configuration setup on a three-node (infra nodes only)
-# OSA (Ubuntu) setup using re-purposed (obsolete) gaming PCs on my home network (the joys of living with three gamers).  
-#
-# As such, I make a few assumptions:
-#
-# First, I assume the typical Ubuntu "enp0s25" interface naming silliness.
-# Second, I'm assuming there is a single NIC with multiple vlans trunked to it per infra node.
-# Third, I'm assuming the single NIC in each machine is configured via DHCP, and I use the last octet of the DHCP-assigned address 
-#     as the last octet of the BR interface ips.  This needs to be accounted for in your openstack_user_config.yml!  
-#     I use DHCP on my network with fixed-addresses for servers, but you may wish to go static config.
-# Fourth, there is a base package install list below based on OSA-Pike Ubuntu deployment instructions, with corosync/pacemaker added 
-#     on for setup-vip.sh in this repo.  Some packages are totally optional, but since we'll be installing OSA-Pike, it makes sense to
-#     include them now to save a bit of typing later.  (and tmux FTW).  Since this script is intended to be run on each infra node, I
-#     skipped the deployment host packages as well, since installing gcc and friends on each infra node seemed...excessive?
-# Lastly, I did not write this in any way, shape, or form, to be run on a production machine.  This is **STRICTLY** intended for running
-#     on a cleanly-installed Ubuntu 16.04 machine.  Don't blame me if you run this on a production box and SHTF.
+ASSUMPTIONS
+I make a lot of assumptions in these scripts.  I wrote them to run pre-configuration setup on a three-node (infra nodes only)
+OSA (Ubuntu) setup using re-purposed (obsolete) gaming PCs on my home network (the joys of living with three gamers).  
+
+As such, I make a few assumptions:
+
+First, I assume the typical Ubuntu "enp0s25" interface naming silliness.
+Second, I'm assuming there is a single NIC with multiple vlans trunked to it per infra node.
+Third, I'm assuming the single NIC in each machine is configured via DHCP, and I use the last octet of the DHCP-assigned address 
+    as the last octet of the BR interface ips.  This needs to be accounted for in your openstack_user_config.yml!  
+    I use DHCP on my network with fixed-addresses for servers, but you may wish to go static config.
+Fourth, there is a base package install list below based on OSA-Pike Ubuntu deployment instructions, with corosync/pacemaker added 
+    on for setup-vip.sh in this repo.  Some packages are totally optional, but since we'll be installing OSA-Pike, it makes sense to
+    include them now to save a bit of typing later.  (and tmux FTW).  Since this script is intended to be run on each infra node, I
+    skipped the deployment host packages as well, since installing gcc and friends on each infra node seemed...excessive?
+Lastly, I did not write this in any way, shape, or form, to be run on a production machine.  This is **STRICTLY** intended for running
+    on a cleanly-installed Ubuntu 16.04 machine.  Don't blame me if you run this on a production box and SHTF.
 
 Once more:
 Don't blame me if you run this on a production box and SHTF.
