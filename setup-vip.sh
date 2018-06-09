@@ -77,10 +77,10 @@ sed -e 's/bindnetaddr: $INFRA1_IP/bindnetaddr: $INFRA3_IP/g' /etc/corosync/coros
 c.conf
 
 # copy the corosync files
-scp /tmp/infra2.corosync.conf root@$INFRA2_IP:/etc/corosync/corosync.conf
-scp /tmp/infra3.corosync.conf root@$INFRA3_IP:/etc/corosync/corosync.conf
-scp /etc/default/corosync root@$INFRA2_IP:/etc/default/corosync
-scp /etc/default/corosync root@$INFRA3_IP:/etc/default/corosync
+scp /tmp/infra2.corosync.conf $INFRA2_IP:/etc/corosync/corosync.conf
+scp /tmp/infra3.corosync.conf $INFRA3_IP:/etc/corosync/corosync.conf
+scp /etc/default/corosync $INFRA2_IP:/etc/default/corosync
+scp /etc/default/corosync $INFRA3_IP:/etc/default/corosync
 scp /etc/corosync/authkey $INFRA2_IP:/etc/corosync/authkey
 scp /etc/corosync/authkey $INFRA3_IP:/etc/corosync/authkey
 
