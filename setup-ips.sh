@@ -10,17 +10,17 @@
 # Second, I'm assuming there is a single NIC with multiple vlans trunked to it per infra node. (see *VLAN variables below)
 # Third, I'm assuming the single NIC in each machine is configured via DHCP, and I use the last octet of the DHCP-assigned address as the last octet of the BR interface ips.
 #     This needs to be accounted for in your openstack_user_config.yml!  I use DHCP on my network with fixed-addresses for servers, but you may wish to go static config.
-# Fourth, there is a base package install list below based on OSA-Pike Ubuntu deployment instructions, with corosync/pacemaker added on for setup-vip.sh in this repo.
+# Fourth, there is a base package install list below based on OSA-Pike Ubuntu deployment instructions.
 #     Some packages are totally optional, but since we'll be installing OSA-Pike, it makes sense to include them now to save a bit of typing later.  (and tmux FTW).
 #     Since this script is intended to be run on each infra node, I skipped the deployment host packages as well, since installing gcc and friends on each infra node seemed...
 #     excessive?
 # Lastly, I did not write this in any way, shape, or form, to be run on a production machine.  This is **STRICTLY** intended for running on a cleanly-installed Ubuntu 16.04
 #     machine.  Don't blame me if you run this on a production box and SHTF.
 
-# BASE PACKAGE SETUP
+# BASE PACKAGE SETUP - moved corosync and friends to setup-vip.sh
 apt-get update
 apt-get dist-upgrade
-apt install -y bridge-utils debootstrap ifenslave{,-2.6} lsof lvm2 ntp ntpdate openssh-server sudo tcpdump vlan tmux pacemaker crmsh corosync cluster-glue resource-agents libqb0
+apt install -y bridge-utils debootstrap ifenslave{,-2.6} lsof lvm2 ntp ntpdate openssh-server sudo tcpdump vlan tmux
 
 # NETWORK CONFIG
 BRMGMTVLAN=2999
