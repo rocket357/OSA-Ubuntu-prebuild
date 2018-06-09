@@ -90,20 +90,20 @@ scp /etc/default/corosync $INFRA2_IP:/etc/default/corosync
 scp /etc/default/corosync $INFRA3_IP:/etc/default/corosync
 scp /etc/corosync/authkey $INFRA2_IP:/etc/corosync/authkey
 scp /etc/corosync/authkey $INFRA3_IP:/etc/corosync/authkey
-
-# configure crm
-crm configure property pe-warn-series-max="1000"   pe-input-series-max="1000"   pe-error-series-max="1000"   cluster
--recheck-interval="5min"
-crm configure property stonith-enabled=false
-crm_verify -L
  
  # restart corosync on each node
 service corosync restart
 ssh $INFRA2_IP service corosync restart
 ssh $INFRA3_IP service corosync restart
  
-# wait for everything to check-in
+# wait for everything to check-in.  Ctrl-C out once everyone is happy
 crm_mon
+
+# configure crm
+crm configure property pe-warn-series-max="1000"   pe-input-series-max="1000"   pe-error-series-max="1000"   cluster
+-recheck-interval="5min"
+crm configure property stonith-enabled=false
+crm_verify -L
 
 # setup vips
 crm configure primitive openstack-int-vip ocf:heartbeat:IPaddr2 params ip="$OSA_INT_VIP_IP" cidr_netmask="22" op moni
