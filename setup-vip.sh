@@ -10,6 +10,9 @@ INFRA3_IP="172.29.236.13"
 OSA_INT_VIP_IP="172.29.239.150"
 OSA_EXT_VIP_IP="172.29.239.151"
 
+# package pre-reqs
+apt install pacemaker crmsh corosync cluster-glue resource-agents libqb0
+
 # corosync
 echo "START=yes" >> /etc/default/corosync 
 
