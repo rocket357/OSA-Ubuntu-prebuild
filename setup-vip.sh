@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This script needs to be run on infra1 only.  Assumes ssh keys are already configured on infra{2,3}
+
 # Use at your own risk.  Do not run this without reading it first.
 # There is a lot hard-coded in this script.  I'm working on generalizing it, but it gives you
 # an idea of what needs to happen to get the VIPs up and running on Ubuntu 16.04
@@ -11,7 +13,9 @@ OSA_INT_VIP_IP="172.29.239.150"
 OSA_EXT_VIP_IP="172.29.239.151"
 
 # package pre-reqs
-apt install pacemaker crmsh corosync cluster-glue resource-agents libqb0
+apt install -y pacemaker crmsh corosync cluster-glue resource-agents libqb0
+ssh $INFRA2_IP apt install -y pacemaker crmsh corosync cluster-glue resource-agents libqb0
+ssh $INFRA3_IP apt install -y pacemaker crmsh corosync cluster-glue resource-agents libqb0
 
 # corosync
 echo "START=yes" >> /etc/default/corosync 
