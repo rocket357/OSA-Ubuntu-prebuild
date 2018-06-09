@@ -1,6 +1,23 @@
 # OSA-Ubuntu-prebuild
 Scripts to configure br-mgmt, br-storage, br-vlan, br-vxlan, etc... along with corosync/pacemaker for HA LB VIPs and openstack-ansible.  Tested on Ubuntu-16.04 with OSA Pike.
 
+Also includes a preseed config file appropriate for auto-installing Ubuntu 16.04.  To accomplish this, you can provide appropriate 
+pxelinux.cfg scripts such as:
+
+    file1# cat /tftp/pxelinux.cfg/01-00-25-64-9d-a8-20
+    DEFAULT vesamenu.c32
+    prompt 0
+    MENU title PXE Boot Menu - infra1
+    MENU AUTOBOOT Starting autoinstall in # seconds
+    LABEL preseed-ubuntu
+        MENU label ^Ubuntu 16.04 autoinstall
+        MENU default
+        TIMEOUT 10
+        KERNEL xenial/linux
+        APPEND initrd=xenial/initrd.gz locale=en_US keyboard-configuration/layoutcode=us ipv6.disable=1 hostname=infra1 interface=enp0s25 auto url=tftp://10.42.0.2/preseed/os-infra.cfg vga=788 --- quiet
+
+Simply ensure the os-infra.cfg file is downloadable and specified in the APPEND line, and you're all set.
+
 These scripts are WIP and targeted to a specific network configuration:
 
 ASSUMPTIONS
