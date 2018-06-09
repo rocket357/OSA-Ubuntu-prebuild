@@ -2,12 +2,13 @@
 
 # Use at your own risk.  Do not run this without reading it first.
 # There is a lot hard-coded in this script.  I'm working on generalizing it, but it gives you
-# an idea of what needs to happen to get the VIP up and running on Ubuntu 16.04
+# an idea of what needs to happen to get the VIPs up and running on Ubuntu 16.04
 
 INFRA1_IP="172.29.236.11"
 INFRA2_IP="172.29.236.12"
 INFRA3_IP="172.29.236.13"
-OSA_VIP_IP="172.29.239.150"
+OSA_INT_VIP_IP="172.29.239.150"
+OSA_EXT_VIP_IP="172.29.239.151"
 
 # corosync
 echo "START=yes" >> /etc/default/corosync 
@@ -63,27 +64,57 @@ quorum {
 }
 
 EOF
-scp /etc/default/corosync root@$INFRA2_IP:/etc/default/corosync
-scp /etc/default/corosync root@$INFRA3_IP:/etc/default/corosync
-sed -e 's/bindnetaddr: $INFRA1_IP/bindnetaddr: $INFRA2_IP/g' /etc/corosync/corosync.conf > /tmp/infra2.corosync.conf
-sed -e 's/bindnetaddr: $INFRA1_IP/bindnetaddr: $INFRA3_IP/g' /etc/corosync/corosync.conf > /tmp/infra3.corosync.conf
+
+service corosync restart
+
+# generate the auth key
+corosync-keygen
+
+# setup files for infra{2,3}
+sed -e 's/bindnetaddr: $INFRA1_IP/bindnetaddr: $INFRA2_IP/g' /etc/corosync/corosync.conf > /tmp/infra2.corosyn
+c.conf
+sed -e 's/bindnetaddr: $INFRA1_IP/bindnetaddr: $INFRA3_IP/g' /etc/corosync/corosync.conf > /tmp/infra3.corosyn
+c.conf
+
+# copy the corosync files
 scp /tmp/infra2.corosync.conf root@$INFRA2_IP:/etc/corosync/corosync.conf
 scp /tmp/infra3.corosync.conf root@$INFRA3_IP:/etc/corosync/corosync.conf
-crm configure property pe-warn-series-max="1000"   pe-input-series-max="1000"   pe-error-series-max="1000"   cluster-recheck-interval="5min"
-crm configure property stonith-enabled=false
-crm_verify -L
-corosync-keygen 
+scp /etc/default/corosync root@$INFRA2_IP:/etc/default/corosync
+scp /etc/default/corosync root@$INFRA3_IP:/etc/default/corosync
 scp /etc/corosync/authkey $INFRA2_IP:/etc/corosync/authkey
 scp /etc/corosync/authkey $INFRA3_IP:/etc/corosync/authkey
+
+# configure crm
+crm configure property pe-warn-series-max="1000"   pe-input-series-max="1000"   pe-error-series-max="1000"   cluster
+-recheck-interval="5min"
+crm configure property stonith-enabled=false
+crm_verify -L
+ 
+ # restart corosync on each node
 service corosync restart
 ssh $INFRA2_IP service corosync restart
 ssh $INFRA3_IP service corosync restart
-crm status
-crm configure primitive openstack-vip ocf:heartbeat:IPaddr2 params ip="$OSA_VIP_IP" cidr_netmask="22" op monitor interval="30s"
+ 
+# wait for everything to check-in
+crm_mon
 
-cd /usr/lib/ocf/resource.d/
-mkdir openstack
-cd openstack
-wget https://raw.github.com/leseb/keystone/ha/tools/ocf/keystone
-wget https://raw.github.com/madkiss/glance/ha/tools/ocf/glance-registry
-wget https://raw.github.com/madkiss/glance/ha/tools/ocf/glance-api
+# setup vips
+crm configure primitive openstack-int-vip ocf:heartbeat:IPaddr2 params ip="$OSA_INT_VIP_IP" cidr_netmask="22" op moni
+tor interval="30s"
+crm configure primitive openstack-ext-vip ocf:heartbeat:IPaddr2 params ip="$OSA_EXT_VIP_IP" cidr_netmask="22" op moni
+tor interval="30s"
+
+# move the vips to their preferred infra nodes (optional)
+crm resource move openstack-int-vip infra2
+crm resource move openstack-ext-vip infra3
+
+# check config
+crm_mon
+
+# other openstack stuff...not in use yet
+#cd /usr/lib/ocf/resource.d/
+#mkdir openstack
+#cd openstack
+#wget https://raw.github.com/leseb/keystone/ha/tools/ocf/keystone
+#wget https://raw.github.com/madkiss/glance/ha/tools/ocf/glance-registry
+#wget https://raw.github.com/madkiss/glance/ha/tools/ocf/glance-api
