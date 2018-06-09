@@ -91,8 +91,7 @@ scp /etc/default/corosync $INFRA3_IP:/etc/default/corosync
 scp /etc/corosync/authkey $INFRA2_IP:/etc/corosync/authkey
 scp /etc/corosync/authkey $INFRA3_IP:/etc/corosync/authkey
  
- # restart corosync on each node
-service corosync restart
+ # restart corosync on the other nodes
 ssh $INFRA2_IP service corosync restart
 ssh $INFRA3_IP service corosync restart
  
